@@ -10,7 +10,7 @@ $Password = ""
 $CounterTotal = ""
 
 # Connect to vCenter
-Connect-VIserver -Server $VMHost -User $Username -Password $Password -Force
+Connect-VIserver -Server $VMHost -User "$Username" -Password "$Password" -Force
 
 for ($counter=1; $counter -le $CounterTotal; $counter++)
 {
