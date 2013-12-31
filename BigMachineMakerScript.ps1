@@ -2,10 +2,10 @@
 
 # Set up our parameters
 
-$Template = ""
-$Datastore = ""
-$VMHost = ""
-$CounterTotal = ""
+$Template = "YOURTEMPLATENAME"
+$Datastore = "YOURDATASTORENAME"
+$VMHost = "YOURHOSTNAME"
+$CounterTotal = "HOWMANYVMS"
 
 # Connect to vCenter
 Connect-VIserver -Server $VMHost -User "YOURUSERNAME" -Password "YOURPASSWORD" -Force
