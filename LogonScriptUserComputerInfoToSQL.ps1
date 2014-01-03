@@ -27,12 +27,30 @@ $LoggedOnUser = $Domain + "\" + $Username
 $TimeToLogon = $time2.TimeOfDay.TotalSeconds - $Time1.TimeGenerated.TimeOfDay.TotalSeconds 
 
 # Get the network information
-$NetInfo = Get-WMIObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPEnabled}
+$NetInfo = Get-WMIObject Win32_NetworkAdapterConfiguration | Where-Object {$_.DNSDomain -eq "market.financial.local"}
+$IPAddress = $NetInfo.IPAddress
+
+# Drive Mappings
+$DriveMappings = Get-WMIObject Win32_MappedLogicalDisk
  
-## Write Values to SQL
+# Connect to SQL
 $dbconn = New-Object System.Data.SqlClient.SqlConnection("Data Source=YOURSQLSERVER; Initial Catalog=LOGINRESULTS; Integrated Security=SSPI")
 $dbconn.Open()
-$dbwrite = $dbconn.CreateCommand()
-$dbwrite.CommandText = "INSERT INTO dbo.tbLogons (LogonDateTime,WorkstationName,LoggedOnUser,TimeToLogon) VALUES ('$LogonDateTime','$WorkstationName','$LoggedOnUser','$TimeToLogon')"
-$dbwrite.ExecuteNonQuery()
+
+# Write the Logon info to the table
+$dbwriteWSinfo = $dbconn.CreateCommand()
+$dbwriteWSinfo.CommandText = "INSERT INTO dbo.tbLogons (LogonDateTime,WorkstationName,LoggedOnUser,TimeToLogon,IPAddress) VALUES ('$LogonDateTime','$WorkstationName','$LoggedOnUser','$TimeToLogon','$IPAddress')"
+$dbwriteWSinfo.ExecuteNonQuery()
+
+# Write the drive mapping info to the table
+ForEach ($DriveMapping in $DriveMappings) {
+	$DriveLetter = $DriveMapping.Caption
+	$DrivePath = $DriveMapping.ProviderName
+
+	$dbwriteDrives = $dbconn.CreateCommand()
+	$dbwriteDrives.CommandText = "INSERT INTO dbo.tblDriveMappings (DriveLetter,DrivePath,Username,Workstation,LogonDateTime) VALUES ('$DriveLetter','$DrivePath','$LoggedOnUser','$WorkstationName','$LogonDateTime')"
+	$dbwriteDrives.ExecuteNonQuery()
+}
+
+# Close the DB connection
 $dbconn.Close()
