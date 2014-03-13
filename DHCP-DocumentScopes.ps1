@@ -1,5 +1,7 @@
 # Document the DHCP Scopes includer all scopes, options, and reservations
 # Stores scope info in a master file and each server will export its reservations and options 
+#
+# REQUIRES Windows Server 2012 or Windows 8 to use the DHCPServer module
 
 Import-Module DHCPServer
 
